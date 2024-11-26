@@ -119,7 +119,7 @@ contains
     call D_MPI_BCAST(iblh_meth  ,1,0,comm3d,mpierr)
     call D_MPI_BCAST(iblh_var   ,1,0,comm3d,mpierr)
     call D_MPI_BCAST(blh_nsamp  ,1,0,comm3d,mpierr)
-    idtav = dtav/tres
+    idtav = int(dtav / tres, kind=kind(idtav))
 
     tnext = idtav+btime
 
@@ -1225,7 +1225,7 @@ contains
 !! - By monitoring a threshold value of some scalar, averaged over a definable number of columns
   subroutine calcblheight
 
-    use modglobal,  only : ih,i1,jh,j1,kmax,k1,cp,rlv,imax,rd,zh,dzh,zf,dzf,rv,ijtot,iadv_sv,iadv_kappa
+    use modglobal,  only : i1,j1,kmax,k1,cp,rlv,imax,rd,zh,dzh,zf,dzf,rv,ijtot,iadv_sv,iadv_kappa
     use modfields,  only : w0,qt0,qt0h,ql0,thl0,thl0h,thv0h,sv0,exnf,whls
     use modsurfdata,only : svs, lhetero, xpatches, ypatches
     use modsurface, only : patchxnr,patchynr
@@ -1265,7 +1265,7 @@ contains
             blh_fld(:,:,:) = w0(:,:,:)*thv0h(:,:,:)
             !$acc end kernels
           case(1:)
-            if (iadv_sv(iblh_var) == iadv_kappa) then
+            if (iadv_sv == iadv_kappa) then
               call halflev_kappa(sv0(:,:,:,iblh_var),sv0h)
               !$acc kernels default(present)
               sv0h(2:i1,2:j1,1) = svs(iblh_var)

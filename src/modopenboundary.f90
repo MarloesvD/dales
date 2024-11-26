@@ -42,12 +42,10 @@ integer :: nx1max,nx2max
 contains
   subroutine initopenboundary
     ! Initialisation routine for openboundaries
-    use modmpi, only : myidx, myidy, nprocx, nprocy,myid
-    use modglobal, only : imax,jmax,kmax,i1,j1,k1,dx,dy,dzf,itot,jtot,zf,zh,solver_id, &
-      & iadv_mom,iadv_thl,iadv_qt,iadv_tke,iadv_sv,nsv,cu,cv
-    use modsurfdata, only : isurf
+    use modmpi, only : myidx, myidy, nprocx, nprocy, myid
+    use modglobal, only : imax,jmax,kmax,i1,j1,k1,dx,dy,itot,jtot,solver_id,nsv,cu,cv
     implicit none
-    integer :: i,j
+    integer :: i
 
     if(.not.lopenbc) return
     ! Check for conflicting options
@@ -168,7 +166,7 @@ contains
       uprof,vprof,thlprof,qtprof,e12prof,svprof
     use modmpi, only : myidx,myidy,myid
     implicit none
-    integer :: VARID,STATUS,NCID,mpierr,timeID,n
+    integer :: VARID,STATUS,NCID,n
     integer, dimension(3) :: istart
     if(.not.lopenbc) return
     if(.not.linithetero) return
@@ -259,13 +257,12 @@ contains
 
   subroutine openboundary_readboundary
     ! Routine reads the boundary input for all time steps
-    use modglobal, only : kmax,cexpnr,imax,jmax,itot,jtot,k1,ntboundary, &
-      tboundary,i1,j1,i2,j2,kmax,nsv,iturb
+    use modglobal, only : cexpnr,imax,jmax,ntboundary,tboundary,nsv,iturb
     use modmpi, only : myidx,myidy
     implicit none
-    integer :: it,i,j,k,ib
+    integer :: ib
     character(len = nf90_max_name) :: RecordDimName
-    integer :: VARID,STATUS,NCID,mpierr,timeID
+    integer :: VARID,STATUS,NCID,timeID
     integer, dimension(3) :: istart
 
     if(.not.lopenbc) return
@@ -437,7 +434,7 @@ contains
     ! Correct for any integrated divergence present in the boundary input
     use modmpi, only : myid,comm3d,mpierr,d_mpi_allreduce,MPI_SUM
     use modglobal, only : imax,jmax,kmax,dzf,dy,dx,xsize,ysize,zh,k1,lwarmstart, &
-      i1,i2,j1,j2,k1,dzh
+      i1,i2,j1,j2,k1
     use modfields, only : u0,um,v0,vm,w0,wm,rhobf,rhobh
     implicit none
     real(field_r) :: sumdiv,div,divpart,divnew,divold
@@ -746,17 +743,16 @@ contains
     ! Routine fills ghost cells based on robin (inflow) or
     ! homogeneous neumann (outflow) boundary conditions. Adds turbulent
     ! pertubations to inflow condition if lsynturb=true.
-    use modglobal, only : dzh,dx,dy,imax,jmax,kmax,rtimee,rdt,i2,j2,k1,i1,j1,tauh,pbc
+    use modglobal, only : dzh,dx,dy,kmax,rtimee,rdt,k1,i1,j1,tauh,pbc
     use modfields, only : u0,v0,w0,e120
-    use modmpi, only : myid
     implicit none
     integer, intent(in) :: sx,ex,sy,ey,sz,ez,ih,jh,ib,nx1,nx2,lmax0
     real(field_r), intent(in), dimension(nx1,nx2,ntboundary) :: val
     real(field_r), intent(in), dimension(nx1,nx2) :: turb
     real(field_r), intent(in), dimension(k1), optional :: profile ! optional for top boundary to take gradient into account
     real(field_r), intent(inout), dimension(sx-ih:ex+ih,sy-jh:ey+jh,sz:ez) :: a
-    integer :: i,j,k,itp,itm,kav=5,itpn,itmn
-    real :: coefdir,coefneu,tp,tm,fp,fm,fpn,fmn,ddz,valtarget,un,e
+    integer :: i,j,k,itp,itm,kav=5
+    real :: coefdir,coefneu,tp,tm,fp,fm,ddz,valtarget,un,e
 
     ! Get interpolation coefficients for boundary input
     itm=1
@@ -791,7 +787,7 @@ contains
             valtarget = (fp*val(j,k,itp)+fm*val(j,k,itm)+turb(j,k))*coefdir
             a(2-ih:sx-1,j+1,k) = ( 2.*dx*valtarget - &
               a(sx,j+1,k)*(coefdir*dx+2.*coefneu) ) / (coefdir*dx-2.*coefneu)
-            if(lmax0==1) a(sx-1,j+1,k) = max(0.,a(sx-1,j+1,k))
+            if(lmax0==1) a(sx-1,j+1,k) = max(0._field_r,a(sx-1,j+1,k))
           endif
         end do
       end do
@@ -808,7 +804,7 @@ contains
             valtarget = (fp*val(j,k,itp)+fm*val(j,k,itm)+turb(j,k))*coefdir
             a(ex+1:i1+ih,j+1,k) = ( 2.*dx*valtarget - &
               a(ex,j+1,k)*(coefdir*dx-2.*coefneu) ) / (coefdir*dx+2.*coefneu)
-            if(lmax0==1) a(ex+1,j+1,k) = max(a(ex+1,j+1,k),0.)
+            if(lmax0==1) a(ex+1,j+1,k) = max(a(ex+1,j+1,k),0._field_r)
           endif
         end do
       end do
@@ -825,7 +821,7 @@ contains
             valtarget = (fp*val(i,k,itp)+fm*val(i,k,itm)+turb(i,k))*coefdir
             a(i+1,2-jh:sy-1,k) = ( 2.*dy*valtarget - &
               a(i+1,sy,k)*(coefdir*dy+2.*coefneu) ) / (coefdir*dy-2.*coefneu)
-            if(lmax0==1) a(i+1,sy-1,k) = max(a(i+1,sy-1,k),0.)
+            if(lmax0==1) a(i+1,sy-1,k) = max(a(i+1,sy-1,k),0._field_r)
           endif
         end do
       end do
@@ -842,7 +838,7 @@ contains
             valtarget = (fp*val(i,k,itp)+fm*val(i,k,itm)+turb(i,k))*coefdir
             a(i+1,ey+1:j1+jh,k) = ( 2.*dy*valtarget - &
               a(i+1,ey,k)*(coefdir*dy-2.*coefneu) ) / (coefdir*dy+2.*coefneu)
-            if(lmax0==1) a(i+1,ey+1,k) = max(a(i+1,ey+1,k),0.)
+            if(lmax0==1) a(i+1,ey+1,k) = max(a(i+1,ey+1,k),0._field_r)
           endif
         end do
       end do
@@ -866,7 +862,7 @@ contains
             valtarget = (fp*val(i,j,itp)+fm*val(i,j,itm)+turb(i,j))*coefdir+ddz*coefneu
             a(i+1,j+1,ez) = ( 2.*dzh(ez)*valtarget - &
               a(i+1,j+1,ez-1)*(coefdir*dzh(ez)-2.*coefneu) ) / (coefdir*dzh(ez)+2.*coefneu)
-            if(lmax0==1) a(i+1,j+1,ez) = max(a(i+1,j+1,ez),0.)
+            if(lmax0==1) a(i+1,j+1,ez) = max(a(i+1,j+1,ez),0._field_r)
           endif
         end do
       end do
@@ -878,14 +874,16 @@ contains
     ! for the boundary-normal velocity components. Adds turbulence to
     ! the inflow dirichlet boundaries if lsynturb=.true.
 
-    use modmpi, only : myidx,myidy,myid
-    use modglobal, only : dx,dy,dzf,dxi,dyi,rdt,i2,j2,k1,i1,j1,kmax,ih,jh,rtimee,rdt,itot,jtot,imax,jmax,grav,taum
-    use modfields, only : um,u0,up,vm,v0,vp,wm,w0,wp,rhobf,rhobh,thvh,thv0h
+    use modmpi, only : myidx,myidy
+    use modglobal, only : dx,dy,dzf,dxi,dyi,rdt,i2,j2,k1,i1,j1,kmax,ih,jh,rtimee,rdt,imax,jmax,grav,taum
+    use modfields, only : u0,up,v0,vp,w0,wp,rhobh,thvh,thv0h
     implicit none
     integer, intent(in) :: nx1,nx2,ib
     real(field_r), intent(in), dimension(nx1,nx2) :: turb
     integer :: i,j,k,itmc,itmn,itpc,itpn,ipatch,jpatch,kpatch
-    real :: tm,tp,fpc,fmc,fpn,fmn,unext,uwallcurrent,ipos,jpos,tau
+    real :: tm,tp,fpc,fmc,fpn,fmn,unext,ipos,jpos,tau
+    real(field_r) :: uwallcurrent
+
     itmc=1
     itmn=1
     if(ntboundary>1) then
@@ -1015,12 +1013,12 @@ contains
     ! Calculates the integrated mass correction term for the boundary normal
     ! velocity components
     use modmpi, only : comm3d,commrow,commcol,myidx,myidy,mpierr, D_MPI_ALLREDUCE, MPI_SUM
-    use modglobal, only : jmax,imax,kmax,i1,j1,dx,dy,dzf,i2,j2,k1,dxi,dyi,rtimee,rdt
+    use modglobal, only : jmax,imax,kmax,i1,j1,dx,dy,dzf,i2,j2,k1,rtimee,rdt
     use modfields, only : rhobf, up, vp, wp
     implicit none
     integer, intent(in) :: ib
-    integer :: ipos,jpos,kpos,ipatch,jpatch,kpatch,i,j,k,itp,itm
-    real :: sum,tp,tm,idtb,dubdt
+    integer :: ipos,jpos,ipatch,jpatch,kpatch,i,j,k,itp,itm
+    real :: tp,tm,idtb,dubdt
 
     itm = 1
     if(ntboundary>1) then
@@ -1169,8 +1167,7 @@ contains
   end subroutine radcorrection
 
   subroutine advecc_2nd_boundary_buffer(a_in,a_out,istart_int,iend_int,jstart_int,jend_int,ibuffer,jbuffer)
-    use modglobal, only : i1,ih,j1,jh,k1,kmax,dxi5,dyi5,dzi5,dzf,dzh,leq
-    use modfields, only : u0, v0, w0, rhobf
+    use modglobal, only : i1,ih,j1,jh,k1
     use advec_2nd, only : hadvecc_2nd
 
     implicit none
@@ -1227,8 +1224,7 @@ contains
   end subroutine
 
   subroutine advecu_2nd_boundary_buffer(a_in,a_out,istart_int,iend_int,jstart_int,jend_int,ibuffer,jbuffer)
-    use modglobal, only : i1,ih,j1,jh,k1,kmax,dxi5,dyi5,dzi5,dzf,dzh,leq
-    use modfields, only : u0, v0, w0, rhobf
+    use modglobal, only : i1,ih,j1,jh,k1
     use advec_2nd, only : hadvecu_2nd
 
     implicit none
@@ -1285,8 +1281,7 @@ contains
   end subroutine
 
   subroutine advecv_2nd_boundary_buffer(a_in,a_out,istart_int,iend_int,jstart_int,jend_int,ibuffer,jbuffer)
-    use modglobal, only : i1,ih,j1,jh,k1,kmax,dxi5,dyi5,dzi5,dzf,dzh,leq
-    use modfields, only : u0, v0, w0, rhobf
+    use modglobal, only : i1,ih,j1,jh,k1
     use advec_2nd, only : hadvecv_2nd
 
     implicit none
@@ -1343,8 +1338,7 @@ contains
   end subroutine
 
   subroutine advecw_2nd_boundary_buffer(a_in,a_out,istart_int,iend_int,jstart_int,jend_int,ibuffer,jbuffer)
-    use modglobal, only : i1,ih,j1,jh,k1,kmax,dxi5,dyi5,dzi5,dzf,dzh,leq
-    use modfields, only : u0, v0, w0, rhobf
+    use modglobal, only : i1,ih,j1,jh,k1
     use advec_2nd, only : hadvecw_2nd
 
     implicit none
