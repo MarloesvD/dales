@@ -1,0 +1,2 @@
+rm -r all* cld* field.001 flux* moments.001 nptend.001 precep.001 profiles.001.nc qlptend.001 qtptend.001 rad* sv001fld.001 sv001flx.001 sv002fld.001 sv002flx.001 tmser.001.nc tmsurf.001 varbudget.001 tmser1.001 000/* 001/*
+
