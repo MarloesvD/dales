@@ -2,8 +2,8 @@
 iexpnr     =  001
 lwarmstart = .false.
 startfile  =  'initdlatestmx000y000.001'
-runtime = 43200
-trestart = 43200
+runtime = 3600
+trestart = -1
 ladaptive  =  .true.
 irandom    =  44
 randthl    =  0.1
@@ -12,17 +12,17 @@ nsv        =  2
 courant    = .5
 peclet     = .1
 loutdirs = .true.
-nprocx = 32
-nprocy = 32
+nprocx = 2
+nprocy = 2
 /
 
 &DOMAIN
-itot = 1536
-jtot = 1536
+itot = 78
+jtot = 78
 kmax       =  175
 
-xsize = 153600
-ysize = 153600
+xsize = 7800
+ysize = 7800
 
 xlat       =  13.1
 xlon       =  302
@@ -67,7 +67,7 @@ iadv_mom   =  62
 iadv_tke   =  62
 iadv_thl   =  62
 iadv_qt    =  52
-iadv_sv    =  52, 52
+iadv_sv    =  52
 /
 
 &NAMMICROPHYSICS
@@ -85,10 +85,10 @@ dtav       = 60
 tcheck     = 0
 /
 &NAMSAMPLING
-lsampcl    = .false.
-lsampco    = .false.
+lsampcl    = .true.
+lsampco    = .true.
 dtav       = 60
-timeav     = 21600
+timeav     = 300
 /
 &NAMTIMESTAT
 ltimestat  = .true.

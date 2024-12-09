@@ -246,7 +246,6 @@ contains
     iret = nf90_redef(ncid)
     dim_tt = (/ztId,timeId/)
     dim_mt = (/zmId,timeId/)
-
     dim_t0tt= (/xtID,ztID,timeId/)! thermo point
     dim_t0mt= (/xtID,zmID,timeId/)! zpoint
     dim_m0tt= (/xmID,ztID,timeId/)! upoint

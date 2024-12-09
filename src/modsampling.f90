@@ -214,12 +214,12 @@ contains
         close (ifoutput)
       enddo
     endif
-
     if (lnetcdf) then
       nsamples = int(itimeav / idtav)
      if (myid==0) then
         allocate(ncname(nvar,4,isamptot))
         call nctiminfo(tncname(1,:))
+		
         fname(10:12) = cexpnr
         call open_nc(fname,ncid,nrec,n3=kmax)
         call define_nc(ncid,1,tncname)
@@ -299,7 +299,7 @@ contains
   end subroutine initsampling
 !> Cleans up after the run
   subroutine exitsampling
-    use modstat_nc, only : lnetcdf
+    use modstat_nc, only : lnetcdf, exitstat_nc
     use modmpi,     only : myid
     implicit none
 
@@ -311,7 +311,10 @@ contains
                 pfavl   ,dwdthavl,dwwdzhavl,dpdzhavl,duwdxhavl,dtaudxhavl,dtaudzhavl,  &
                 thvhavl ,fcorhavl,wh_el,sigh_el)
     deallocate(wadvhavl,subphavl,nrtsamphav)
-    if (lnetcdf .and. myid==0) deallocate(ncname)
+    if (lnetcdf .and. myid==0) then
+		call exitstat_nc(ncid)
+		deallocate(ncname)
+	end if
 
   end subroutine exitsampling
 
@@ -807,7 +810,6 @@ contains
     allocate (wh_e(k1,isamptot),sigh_e(k1,isamptot))
     allocate (wadvhav(k1,isamptot),wadvhmn(k1))
     allocate (subphav(k1,isamptot),subphmn(k1))
-
     nsecs   = nint(rtimee)
     nhrs    = int(nsecs/3600)
     nminut  = int(nsecs/60)-nhrs*60

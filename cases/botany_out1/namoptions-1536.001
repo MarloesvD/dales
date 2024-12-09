@@ -89,6 +89,11 @@ lsampcl    = .true.
 lsampco    = .true.
 dtav       = 10
 timeav     = 10
+lsamptend = .true.
+lsamptendw = .true.
+lsamptendthl = .true.
+lsamptendqt = .true.
+lprocblock = .true.
 /
 &NAMTIMESTAT
 ltimestat  = .true.
