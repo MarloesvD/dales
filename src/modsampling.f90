@@ -56,17 +56,19 @@ save
   real,allocatable, dimension(:,:) :: wadvhavl,subphavl
   integer,allocatable, dimension(:,:) :: nrtsamphav
   character(80) :: fname = 'sampling.xxx.nc'
+  character(80) :: fname_block = 'sampling.xxxxyxxx.xxx.nc'
   integer :: ncid,nrec = 0
 
 contains
 !> Initialization routine, reads namelists and inits variables
   subroutine initsampling
-    use modmpi,    only : comm3d,mpierr,myid,D_MPI_BCAST
+    use modmpi,    only : comm3d,mpierr,myid,D_MPI_BCAST, cmyid
     use modglobal, only : ladaptive, dtmax,k1,ifnamopt,fname_options,kmax,   &
-                          btime,tres,cexpnr,ifoutput,lwarmstart,checknamelisterror
+                          btime,tres,cexpnr,ifoutput,lwarmstart,checknamelisterror, output_prefix
     use modstat_nc, only : lnetcdf,define_nc,ncinfo,open_nc,define_nc,ncinfo,nctiminfo,writestat_dims_nc
 !     use modgenstat, only : idtav_prof=>idtav, itimeav_prof=>itimeav
     implicit none
+	logical :: proc = .true.
 
     integer :: ierr
 
@@ -217,13 +219,21 @@ contains
 
     if (lnetcdf) then
       nsamples = int(itimeav / idtav)
-     if (myid==0) then
+     if (myid==0 .or. lprocblock) then
         allocate(ncname(nvar,4,isamptot))
         call nctiminfo(tncname(1,:))
-        fname(10:12) = cexpnr
-        call open_nc(fname,ncid,nrec,n3=kmax)
-        call define_nc(ncid,1,tncname)
-        call writestat_dims_nc(ncid)
+		if (lprocblock) then
+		  fname_block(10:17) = cmyid
+		  fname_block(19:21) = cexpnr
+		  call open_nc(trim(output_prefix)//fname_block,ncid,nrec,n1=1,n2=1,n3=kmax)
+		  call define_nc(ncid,1,tncname)
+		  call writestat_dims_nc(ncid,1,1,proc)
+		else
+          fname(10:12) = cexpnr
+          call open_nc(fname,ncid,nrec,n3=kmax)
+          call define_nc(ncid,1,tncname)
+          call writestat_dims_nc(ncid)
+		end if
         do isamp=1,isamptot
           call ncinfo(ncname( 1,:,isamp),'nrsamp'//samplname(isamp),&
           trim(longsamplname(isamp))//' '//'number of points','-','tt')
