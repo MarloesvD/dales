@@ -69,6 +69,7 @@ contains
 !     use modgenstat, only : idtav_prof=>idtav, itimeav_prof=>itimeav
     implicit none
 	logical :: proc = .true.
+	character(80) :: dimst, dimsm
 
     integer :: ierr
 
@@ -225,80 +226,84 @@ contains
 		if (lprocblock) then
 		  fname_block(10:17) = cmyid
 		  fname_block(19:21) = cexpnr
+		  dimst = 'tttt'
+		  dimsm = 'ttmt'
 		  call open_nc(trim(output_prefix)//fname_block,ncid,nrec,n1=1,n2=1,n3=kmax)
 		  call define_nc(ncid,1,tncname)
 		  call writestat_dims_nc(ncid,1,1,proc)
 		else
           fname(10:12) = cexpnr
+		  dimst = 'tt'
+		  dimsm = 'mt'
           call open_nc(fname,ncid,nrec,n3=kmax)
           call define_nc(ncid,1,tncname)
           call writestat_dims_nc(ncid)
 		end if
         do isamp=1,isamptot
           call ncinfo(ncname( 1,:,isamp),'nrsamp'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'number of points','-','tt')
+          trim(longsamplname(isamp))//' '//'number of points','-',dimst)
           call ncinfo(ncname( 2,:,isamp),'w'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mean vertical velocity','m/s','mt')
+          trim(longsamplname(isamp))//' '//'mean vertical velocity','m/s',dimsm)
           call ncinfo(ncname( 3,:,isamp),'thl'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mean liquid water potential temperature','K','tt')
+          trim(longsamplname(isamp))//' '//'mean liquid water potential temperature','K',dimst)
           call ncinfo(ncname( 4,:,isamp),'qt'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mean total water content','kg/kg','tt')
+          trim(longsamplname(isamp))//' '//'mean total water content','kg/kg',dimst)
           call ncinfo(ncname( 5,:,isamp),'ql'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mean liquid water content','kg/kg','tt')
+          trim(longsamplname(isamp))//' '//'mean liquid water content','kg/kg',dimst)
           call ncinfo(ncname( 6,:,isamp),'thv'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mean virtual potential temperature','K','tt')
+          trim(longsamplname(isamp))//' '//'mean virtual potential temperature','K',dimst)
           call ncinfo(ncname( 7,:,isamp),'massflx'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'mass flux','m^3/s','mt')
+          trim(longsamplname(isamp))//' '//'mass flux','m^3/s',dimsm)
           call ncinfo(ncname( 8,:,isamp),'wthl'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'theta_l flux','K m/s','mt')
+          trim(longsamplname(isamp))//' '//'theta_l flux','K m/s',dimsm)
           call ncinfo(ncname( 9,:,isamp),'wqt'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'total water flux','kg/kg m/s','mt')
+          trim(longsamplname(isamp))//' '//'total water flux','kg/kg m/s',dimsm)
           call ncinfo(ncname(10,:,isamp),'wql'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'liquid water flux','kg/kg m/s','mt')
+          trim(longsamplname(isamp))//' '//'liquid water flux','kg/kg m/s',dimsm)
           call ncinfo(ncname(11,:,isamp),'wthv'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'theta_v flux','K m/s','mt')
+          trim(longsamplname(isamp))//' '//'theta_v flux','K m/s',dimsm)
           call ncinfo(ncname(12,:,isamp),'uw'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'uw flux','m^2/s^2','mt')
+          trim(longsamplname(isamp))//' '//'uw flux','m^2/s^2',dimsm)
           call ncinfo(ncname(13,:,isamp),'vw'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'vw flux','m^2/s^2','mt')
+          trim(longsamplname(isamp))//' '//'vw flux','m^2/s^2',dimsm)
           call ncinfo(ncname(14,:,isamp),'nrsamph'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'number of points at halflevel','-','mt')
+          trim(longsamplname(isamp))//' '//'number of points at halflevel','-',dimsm)
           call ncinfo(ncname(15,:,isamp),'pf'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '// 'pressure','kg/m/s^2','tt')
+          trim(longsamplname(isamp))//' '// 'pressure','kg/m/s^2',dimst)
           call ncinfo(ncname(16,:,isamp),'wwrh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'ww res flux','m^2/s^2','mt')
+          trim(longsamplname(isamp))//' '//'ww res flux','m^2/s^2',dimsm)
           call ncinfo(ncname(17,:,isamp),'wwsf'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'ww sub flux','m^2/s^2','mt')
+          trim(longsamplname(isamp))//' '//'ww sub flux','m^2/s^2',dimsm)
           call ncinfo(ncname(18,:,isamp),'dwdth'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'dwdt at sampled point','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'dwdt at sampled point','m/s^2',dimsm)
           call ncinfo(ncname(19,:,isamp),'buoyh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'buoyancy force','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'buoyancy force','m/s^2',dimsm)
           call ncinfo(ncname(20,:,isamp),'dpdzh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'vertical pressure force','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'vertical pressure force','m/s^2',dimsm)
           call ncinfo(ncname(21,:,isamp),'dwwdzh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'resolved vertical w advection','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'resolved vertical w advection','m/s^2',dimsm)
           call ncinfo(ncname(22,:,isamp),'duwdxh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'resolved horizontal w advection','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'resolved horizontal w advection','m/s^2',dimsm)
           call ncinfo(ncname(23,:,isamp),'dtaudzh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'sg vertical w advection','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'sg vertical w advection','m/s^2',dimsm)
           call ncinfo(ncname(24,:,isamp),'dtaudxh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'sg horizontal w advection','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'sg horizontal w advection','m/s^2',dimsm)
           call ncinfo(ncname(25,:,isamp),'fcorh'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'coriolis force on w','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'coriolis force on w','m/s^2',dimsm)
           call ncinfo(ncname(26,:,isamp),'resid'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'residual term in sampled budget eqn','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'residual term in sampled budget eqn','m/s^2',dimsm)
           call ncinfo(ncname(27,:,isamp),'whend'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'ws at end of sampling period','m/s','mt')
+          trim(longsamplname(isamp))//' '//'ws at end of sampling period','m/s',dimsm)
           call ncinfo(ncname(28,:,isamp),'sighend'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'sigma at end of period','-','mt')
+          trim(longsamplname(isamp))//' '//'sigma at end of period','-',dimsm)
           call ncinfo(ncname(29,:,isamp),'qrsamp'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'sampled qr','kg/kg','tt')
+          trim(longsamplname(isamp))//' '//'sampled qr','kg/kg',dimst)
           call ncinfo(ncname(30,:,isamp),'wadvhavl'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'instantaneous d/dz (w_s)^2','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'instantaneous d/dz (w_s)^2','m/s^2',dimsm)
           call ncinfo(ncname(31,:,isamp),'subphavl'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'subplume term in ww budget','m/s^2','mt')
+          trim(longsamplname(isamp))//' '//'subplume term in ww budget','m/s^2',dimsm)
           call ncinfo(ncname(32,:,isamp),'nrtsamphav'//samplname(isamp),&
-          trim(longsamplname(isamp))//' '//'sampling fraction for gradients','-','mt')
+          trim(longsamplname(isamp))//' '//'sampling fraction for gradients','-',dimsm)
           call define_nc( ncid, NVar, ncname(:,:,isamp))
         end do
      end if
@@ -321,7 +326,7 @@ contains
                 pfavl   ,dwdthavl,dwwdzhavl,dpdzhavl,duwdxhavl,dtaudxhavl,dtaudzhavl,  &
                 thvhavl ,fcorhavl,wh_el,sigh_el)
     deallocate(wadvhavl,subphavl,nrtsamphav)
-    if (lnetcdf .and. myid==0) then
+    if (lnetcdf .and. (myid==0 .or. lprocblock)) then
         call exitstat_nc(ncid)
         deallocate(ncname)
     end if
@@ -785,6 +790,7 @@ contains
 
     implicit none
     real,dimension(k1,nvar) :: vars
+	real,dimension(1,1,k1,nvar) :: vars_pb
 
     real, allocatable, dimension(:)  :: wfmn,thlfmn,thvfmn,qtfmn,qlfmn,nrsampfmn,massflxhmn, &
                                         wthlthmn,wthvthmn,wqtthmn,wqlthmn,uwthmn,vwthmn,qrfmn
@@ -827,39 +833,77 @@ contains
     nsecs   = mod(nsecs,60)
     inorm   = nint(ijtot*timeav/dtav)
 
-    call D_MPI_ALLREDUCE(nrsampfl   ,nrsampf    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wfavl      ,wfav       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(thlfavl    ,thlfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(thvfavl    ,thvfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(qtfavl     ,qtfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(qlfavl     ,qlfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(massflxhavl,massflxhav ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wthlthavl  ,wthlthav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wthvthavl  ,wthvthav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wqtthavl   ,wqtthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wqlthavl   ,wqlthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(uwthavl    ,uwthav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(vwthavl    ,vwthav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(qrfavl     ,qrfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+    if (lprocblock) then
+		! Keep sums on each processor
+		nrsampf = nrsampfl
+		wfav = wfavl
+		thlfav = thlfavl
+		thvfav = thvfavl
+		qtfav = qtfavl
+		qlfav = qlfavl
+		massflxhav = massflxhavl
+		wthlthav   = wthlthavl
+		wthvthav   = wthvthavl
+		wqtthav    = wqtthavl
+		wqlthav    = wqlthavl
+		uwthav     = uwthavl
+		vwthav     = vwthavl
+		qrfav      = qrfavl
 
-    call D_MPI_ALLREDUCE(nrsamphl   ,nrsamph    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wwrhavl    ,wwrhav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(wwsfavl    ,wwsfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(pfavl      ,pfav       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(dwdthavl   ,dwdthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(dwwdzhavl  ,dwwdzhav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(dpdzhavl   ,dpdzhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(duwdxhavl  ,duwdxhav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(dtaudxhavl ,dtaudxhav  ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(dtaudzhavl ,dtaudzhav  ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(thvhavl    ,thvhav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(fcorhavl   ,fcorhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		nrsamph    = nrsamphl
+		wwrhav     = wwrhavl
+		wwsfav     = wwsfavl
+		pfav       = pfavl
+		dwdthav    = dwdthavl
+		dwwdzhav   = dwwdzhavl
+		dpdzhav    = dpdzhavl
+		duwdxhav   = duwdxhavl
+		dtaudxhav  = dtaudxhavl
+		dtaudzhav  = dtaudzhavl
+		thvhav     = thvhavl
+		fcorhav    = fcorhavl
 
-    call D_MPI_ALLREDUCE(wh_el      ,wh_e       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(sigh_el    ,sigh_e     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		wh_e       = wh_el
+		sigh_e     = sigh_el
 
-    call D_MPI_ALLREDUCE(wadvhavl   ,wadvhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
-    call D_MPI_ALLREDUCE(subphavl   ,subphav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		wadvhav    = wadvhavl
+		subphav    = subphavl
+	else
+		! Sum over all processors
+		call D_MPI_ALLREDUCE(nrsampfl   ,nrsampf    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wfavl      ,wfav       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(thlfavl    ,thlfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(thvfavl    ,thvfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(qtfavl     ,qtfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(qlfavl     ,qlfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(massflxhavl,massflxhav ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wthlthavl  ,wthlthav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wthvthavl  ,wthvthav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wqtthavl   ,wqtthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wqlthavl   ,wqlthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(uwthavl    ,uwthav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(vwthavl    ,vwthav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(qrfavl     ,qrfav      ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+
+		call D_MPI_ALLREDUCE(nrsamphl   ,nrsamph    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wwrhavl    ,wwrhav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(wwsfavl    ,wwsfav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(pfavl      ,pfav       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(dwdthavl   ,dwdthav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(dwwdzhavl  ,dwwdzhav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(dpdzhavl   ,dpdzhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(duwdxhavl  ,duwdxhav   ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(dtaudxhavl ,dtaudxhav  ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(dtaudzhavl ,dtaudzhav  ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(thvhavl    ,thvhav     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(fcorhavl   ,fcorhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+
+		call D_MPI_ALLREDUCE(wh_el      ,wh_e       ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(sigh_el    ,sigh_e     ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+
+		call D_MPI_ALLREDUCE(wadvhavl   ,wadvhav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+		call D_MPI_ALLREDUCE(subphavl   ,subphav    ,isamptot*k1,MPI_SUM,comm3d,mpierr)
+	end if
 !reset variables
     nrsampfl    = 0.0
     wfavl       = 0.0
@@ -895,9 +939,9 @@ contains
     wadvhavl    = 0.
     subphavl    = 0.
 
-    if (myid==0) then
+    if (myid==0 .or. lprocblock) then
       if (lnetcdf) then
-      call writestat_nc(ncid,1,tncname,(/rtimee/),nrec,.true.)
+        call writestat_nc(ncid,1,tncname,(/rtimee/),nrec,.true.)
       endif
       do isamp = 1,isamptot
 
@@ -1105,7 +1149,12 @@ contains
           else
             vars(:,2:nvar)=nc_fillvalue
           end if
-          call writestat_nc(ncid,nvar,ncname(:,:,isamp),vars(1:kmax,:),nrec,kmax)
+		  if (lprocblock) then
+		    vars_pb(1,1,:,:) = vars(:,:)
+			call writestat_nc(ncid,nvar,ncname(:,:,isamp),vars_pb(:,:,1:kmax,:),nrec,1,1,kmax)
+		  else
+            call writestat_nc(ncid,nvar,ncname(:,:,isamp),vars(1:kmax,:),nrec,kmax)
+		  end if
         end if
 
       end do
