@@ -1063,7 +1063,6 @@ contains
                                                   /dzh(kmax))
 
     !******include rho if rho = rho(z) /= 1.0 ***********
-
     if (llsadv) then
       if (myid==0) stop 'llsadv should not be used anymore. Large scale gradients were calculated in a non physical way (and lmomsubs had to be set to true to retain conservation of mass)'
     end if
