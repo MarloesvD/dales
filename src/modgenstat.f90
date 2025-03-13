@@ -485,6 +485,7 @@ contains
           call define_nc( ncid, 1, tncname)
           call writestat_dims_nc(ncid)
         end if
+		write(*,*) "modgenstat.f90: define_nc2 with ncname=", ncname
         call define_nc( ncid, NVar, ncname)
       end if
 
