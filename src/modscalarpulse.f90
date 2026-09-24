@@ -86,11 +86,13 @@ contains
       dt_lim = minval((/dt_lim,timepulse-timee/))
       return
     end if
-    if (timee>=timepulse) then
+    if (abs(timee-timepulse)<1e-5) then
       if (myid==0) then
         print *, 'Performing scalar pulse...'
       end if
       call do_scalarpulse
+      lscalarpulse = .false.
+    elseif (timee>timepulse) then
       lscalarpulse = .false.
     end if
 
